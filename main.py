@@ -71,9 +71,14 @@ class Grid:
         self.columns = np.arange(columns)
         self.rows = np.arange(rows)
         # self.grid = [[Cell(x, y) for y in range(self.row)] for x in range(self.column)]
+        # self.grid = [
+        #     [Cell(x, y, "BOARDER") for x in range(self.column)] for y in range(self.row)
+        # ]
         self.grid = [
             [Cell(x, y, "BOARDER") for y in range(self.row)] for x in range(self.column)
         ]
+        # self.grid_visual = [["N" for x in range(self.column)] for y in range(self.row)]
+        # self.grid_visual = [["#" for y in range(self.row)] for x in range(self.column)]
         print("\033[2J")
 
     def update_grid(self):
@@ -90,6 +95,7 @@ class Grid:
                 down = self.grid[x][y + 1]
 
                 current.update(left, right, up, down)
+                # self.grid_visual[x][y] = current.visual
 
     def draw_grid(self):
 
@@ -98,6 +104,11 @@ class Grid:
             [self.grid[x][y].visual for x in range(self.column)]
             for y in range(self.row)
         ]
+
+        # grid_visual = [
+        #     [self.grid[x][y].visual for y in range(self.row)]
+        #     for x in range(self.column)
+        # ]
 
         # Draw Frame
         output = "\033[H" + "\n".join("".join(row) for row in grid_visual)
@@ -118,11 +129,11 @@ grid = Grid(ROWS, COLUMNS)
 
 grid.add_cell(1, 1, ROWS, COLUMNS, "STANDARD")
 grid.add_cell(ROWS, 1, ROWS, COLUMNS, "CONST", initial_temp=0.0)  # Bottom wall
-grid.add_cell(1, 1, 1, COLUMNS, "CONST", initial_temp=50.0)  # Top Wall
-grid.add_cell(1, 1, ROWS, 1, "CONST", initial_temp=30.0)  # Left Wall
-grid.add_cell(1, COLUMNS, ROWS, COLUMNS, "SIN", initial_temp=100.0)  # Right wall
+grid.add_cell(1, 1, 1, COLUMNS, "CONST", initial_temp=100.0)  # Top Wall
+grid.add_cell(1, 1, ROWS, 1, "CONST", initial_temp=0.0)  # Left Wall
+grid.add_cell(1, COLUMNS, ROWS, COLUMNS, "CONST", initial_temp=80.0)  # Right wall
 
-grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
+# grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
 
 try:
     while True:
