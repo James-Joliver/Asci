@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 
 
@@ -11,35 +9,31 @@ class Cell:
         self.visual = "0"
         self.temperature = initial_temp
 
+        # Initialize Visual
         if self.type == "CONST":
             self.visual = "0"
-
         elif self.type == "BOARDER":
             self.visual = "#"
-
         elif self.type == "STANDARD":
             self.visual = "/"
-
         elif self.type == "SIN":
             self.visual = "%"
             self.itterator = 0
             self.multiplyer = initial_temp
-
         else:
             raise TypeError(f"{self.type} is not a valid type")
 
     def update(self, left, right, up, down):
+
+        # Temperature Logic
         if self.type == "CONST":
             self.temperature = self.temperature
-
         elif self.type == "BOARDER":
             pass
-
         elif self.type == "STANDARD":
             self.temperature = (
                 left.temperature + right.temperature + up.temperature + down.temperature
             ) / 4
-
         elif self.type == "SIN":
             self.itterator += 0.001
             self.temperature = np.sin(self.itterator) * self.multiplyer
@@ -47,6 +41,7 @@ class Cell:
         else:
             raise TypeError(f"{self.type} is not a valid type")
 
+        # Choose Visual
         if self.type != "BOARDER":
             if self.temperature <= 15:
                 self.visual = "."
@@ -69,21 +64,21 @@ class Grid:
         self.column = columns + 2  # x : Leave room for the boarder
         self.row = rows + 2  # y : Leave room for the boarder
 
+        # Initialize Grids
         self.grid = [
             [Cell(x, y, "BOARDER") for y in range(self.row)] for x in range(self.column)
         ]
-
         self.grid_visual = [
             [self.grid[x][y].visual for x in range(self.column)]
             for y in range(self.row)
         ]
+
+        # Clear Screen
         print("\033[2J")
 
     def update_grid(self):
 
-        # TODO: Impliment a better Boundary compensation method
-        #
-        # for x in range(1, self.column + 1):
+        # Update Each Cell
         for x in range(1, self.column - 1):
             for y in range(1, self.row - 1):
                 current = self.grid[x][y]
@@ -93,6 +88,7 @@ class Grid:
                 down = self.grid[x][y + 1]
 
                 current.update(left, right, up, down)
+
                 # y and x are inversed here because of how the output is formulated
                 self.grid_visual[y][x] = current.visual
 
@@ -112,22 +108,20 @@ class Grid:
 ROWS = 50
 COLUMNS = 100
 
+# Initialize Grid
 grid = Grid(ROWS, COLUMNS)
 
-
+# Add Cells to Grid
 grid.add_cell(1, 1, ROWS, COLUMNS, "STANDARD")
 grid.add_cell(ROWS, 1, ROWS, COLUMNS, "CONST", initial_temp=0.0)  # Bottom wall
 grid.add_cell(1, 1, 1, COLUMNS, "CONST", initial_temp=100.0)  # Top Wall
 grid.add_cell(1, 1, ROWS, 1, "CONST", initial_temp=0.0)  # Left Wall
 grid.add_cell(1, COLUMNS, ROWS, COLUMNS, "CONST", initial_temp=80.0)  # Right wall
-
 grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
 
 try:
     while True:
         grid.update_grid()
         grid.draw_grid()
-        # time.sleep(0.01)
-        # print(grid.grid[COLUMNS - 1][ROWS - 5].temperature)
 except KeyboardInterrupt:
     print("\nStopped")
