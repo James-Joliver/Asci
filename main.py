@@ -77,7 +77,7 @@ class Grid:
         self.grid = [
             [Cell(x, y, "BOARDER") for y in range(self.row)] for x in range(self.column)
         ]
-        # self.grid_visual = [["N" for x in range(self.column)] for y in range(self.row)]
+        self.grid_visual = [["N" for x in range(self.column)] for y in range(self.row)]
         # self.grid_visual = [["#" for y in range(self.row)] for x in range(self.column)]
         print("\033[2J")
 
@@ -95,7 +95,7 @@ class Grid:
                 down = self.grid[x][y + 1]
 
                 current.update(left, right, up, down)
-                # self.grid_visual[x][y] = current.visual
+                self.grid_visual[y][x] = current.visual
 
     def draw_grid(self):
 
@@ -111,7 +111,7 @@ class Grid:
         # ]
 
         # Draw Frame
-        output = "\033[H" + "\n".join("".join(row) for row in grid_visual)
+        output = "\033[H" + "\n".join("".join(row) for row in self.grid_visual)
         print(output, end="")
 
     def add_cell(self, row1, column1, row2, column2, cell_type, initial_temp=0.0):
@@ -119,6 +119,9 @@ class Grid:
         for column in range(column1, column2 + 1):
             for row in range(row1, row2 + 1):
                 self.grid[column][row] = Cell(column, row, cell_type, initial_temp)
+        # for column in range(row1, row2 + 1):
+        #     for row in range(column1, column2 + 1):
+        #         self.grid[column][row] = Cell(column, row, cell_type, initial_temp)
 
 
 ROWS = 50
