@@ -68,17 +68,15 @@ class Grid:
     def __init__(self, rows, columns):
         self.column = columns + 2  # x : Leave room for the boarder
         self.row = rows + 2  # y : Leave room for the boarder
-        self.columns = np.arange(columns)
-        self.rows = np.arange(rows)
-        # self.grid = [[Cell(x, y) for y in range(self.row)] for x in range(self.column)]
-        # self.grid = [
-        #     [Cell(x, y, "BOARDER") for x in range(self.column)] for y in range(self.row)
-        # ]
+
         self.grid = [
             [Cell(x, y, "BOARDER") for y in range(self.row)] for x in range(self.column)
         ]
-        self.grid_visual = [["N" for x in range(self.column)] for y in range(self.row)]
-        # self.grid_visual = [["#" for y in range(self.row)] for x in range(self.column)]
+
+        self.grid_visual = [
+            [self.grid[x][y].visual for x in range(self.column)]
+            for y in range(self.row)
+        ]
         print("\033[2J")
 
     def update_grid(self):
@@ -95,20 +93,10 @@ class Grid:
                 down = self.grid[x][y + 1]
 
                 current.update(left, right, up, down)
+                # y and x are inversed here because of how the output is formulated
                 self.grid_visual[y][x] = current.visual
 
     def draw_grid(self):
-
-        # Build Visual Of Grid
-        grid_visual = [
-            [self.grid[x][y].visual for x in range(self.column)]
-            for y in range(self.row)
-        ]
-
-        # grid_visual = [
-        #     [self.grid[x][y].visual for y in range(self.row)]
-        #     for x in range(self.column)
-        # ]
 
         # Draw Frame
         output = "\033[H" + "\n".join("".join(row) for row in self.grid_visual)
@@ -119,9 +107,6 @@ class Grid:
         for column in range(column1, column2 + 1):
             for row in range(row1, row2 + 1):
                 self.grid[column][row] = Cell(column, row, cell_type, initial_temp)
-        # for column in range(row1, row2 + 1):
-        #     for row in range(column1, column2 + 1):
-        #         self.grid[column][row] = Cell(column, row, cell_type, initial_temp)
 
 
 ROWS = 50
@@ -136,7 +121,7 @@ grid.add_cell(1, 1, 1, COLUMNS, "CONST", initial_temp=100.0)  # Top Wall
 grid.add_cell(1, 1, ROWS, 1, "CONST", initial_temp=0.0)  # Left Wall
 grid.add_cell(1, COLUMNS, ROWS, COLUMNS, "CONST", initial_temp=80.0)  # Right wall
 
-# grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
+grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
 
 try:
     while True:
