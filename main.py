@@ -1,3 +1,5 @@
+import curses
+
 import numpy as np
 
 
@@ -104,6 +106,12 @@ class Grid:
             for row in range(row1, row2 + 1):
                 self.grid[column][row] = Cell(column, row, cell_type, initial_temp)
 
+    def set_cell_temp(self, row1, column1, row2, column2, cell_type, initial_temp=0.0):
+
+        for column in range(column1, column2 + 1):
+            for row in range(row1, row2 + 1):
+                self.grid[column][row].temperature = initial_temp
+
 
 ROWS = 50
 COLUMNS = 100
@@ -119,9 +127,19 @@ grid.add_cell(1, 1, ROWS, 1, "CONST", initial_temp=0.0)  # Left Wall
 grid.add_cell(1, COLUMNS, ROWS, COLUMNS, "CONST", initial_temp=80.0)  # Right wall
 grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
 
-try:
-    while True:
-        grid.update_grid()
-        grid.draw_grid()
-except KeyboardInterrupt:
-    print("\nStopped")
+curses.curs_set(0)
+curses.mousemask(curses.ALL_MOUSE_EVENTS)
+
+
+def main(stdscr):
+    try:
+        while True:
+            _, x, y, _, _ = curses.getmouse()
+            grid.set_cell_temp(y, x, x + 10, y + 10, 100)
+            grid.update_grid()
+            grid.draw_grid()
+    except KeyboardInterrupt:
+        print("\nStopped")
+
+
+curses.wrapper(main)
