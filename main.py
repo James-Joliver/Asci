@@ -2,12 +2,24 @@ import numpy as np
 
 
 class Cell:
-    def __init__(self, x: int, y: int, type: str, initial_temp: float = 0.0):
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        type: str,
+        initial_temp: float = 0.0,
+        q_dot: float = 0.0,
+        k: float = 0.0,
+        dx: float = 0.0,
+    ):
         self.x = x
         self.y = y
         self.type = type
         self.visual = "0"
         self.temperature = initial_temp
+        self.q_dot = q_dot
+        self.k = k
+        self.dx = dx
 
         # Initialize Visual
         if self.type == "CONST":
@@ -34,7 +46,9 @@ class Cell:
             temps = [
                 x.temperature for x in [left, right, up, down] if x.type != "BOARDER"
             ]
-            self.temperature = sum(temps) / len(temps)
+            self.temperature = sum(temps) / len(temps) + (self.q_dot * self.dx**2) / (
+                len(temps) * self.k
+            )
         elif self.type == "SIN":
             self.itterator += 0.001
             self.temperature = np.sin(self.itterator) * self.multiplyer
@@ -99,11 +113,24 @@ class Grid:
         output = "\033[H" + "\n".join("".join(row) for row in self.grid_visual)
         print(output, end="")
 
-    def add_cell(self, row1, column1, row2, column2, cell_type, initial_temp=0.0):
+    def add_cell(
+        self,
+        row1,
+        column1,
+        row2,
+        column2,
+        cell_type,
+        initial_temp=0.0,
+        q_dot=0.0,
+        k=0.0,
+        dx=0.0,
+    ):
 
         for column in range(column1, column2 + 1):
             for row in range(row1, row2 + 1):
-                self.grid[column][row] = Cell(column, row, cell_type, initial_temp)
+                self.grid[column][row] = Cell(
+                    column, row, cell_type, initial_temp, q_dot, k, dx
+                )
 
 
 ROWS = 50
@@ -113,12 +140,13 @@ COLUMNS = 100
 grid = Grid(ROWS, COLUMNS)
 
 # Add Cells to Grid
-grid.add_cell(1, 1, ROWS, COLUMNS, "STANDARD")
+grid.add_cell(1, 1, ROWS, COLUMNS, "STANDARD", 0.0, 0.5, 1, 1)
+# grid.add_cell(1, 1, ROWS, COLUMNS, "STANDARD")
 grid.add_cell(ROWS, 1, ROWS, COLUMNS, "CONST", initial_temp=0.0)  # Bottom wall
 grid.add_cell(1, 1, 1, COLUMNS, "CONST", initial_temp=100.0)  # Top Wall
 grid.add_cell(1, 1, ROWS, 1, "CONST", initial_temp=0.0)  # Left Wall
 grid.add_cell(1, COLUMNS, ROWS, COLUMNS, "CONST", initial_temp=80.0)  # Right wall
-grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
+# grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
 
 # grid.add_cell(1, 1, 1, 1, "CONST", initial_temp=100)
 
