@@ -31,9 +31,10 @@ class Cell:
         elif self.type == "BOARDER":
             pass
         elif self.type == "STANDARD":
-            self.temperature = (
-                left.temperature + right.temperature + up.temperature + down.temperature
-            ) / 4
+            temps = [
+                x.temperature for x in [left, right, up, down] if x.type != "BOARDER"
+            ]
+            self.temperature = sum(temps) / len(temps)
         elif self.type == "SIN":
             self.itterator += 0.001
             self.temperature = np.sin(self.itterator) * self.multiplyer
@@ -118,6 +119,8 @@ grid.add_cell(1, 1, 1, COLUMNS, "CONST", initial_temp=100.0)  # Top Wall
 grid.add_cell(1, 1, ROWS, 1, "CONST", initial_temp=0.0)  # Left Wall
 grid.add_cell(1, COLUMNS, ROWS, COLUMNS, "CONST", initial_temp=80.0)  # Right wall
 grid.add_cell(20, 50, 30, 60, "SIN", initial_temp=100.0)  # Center ish box
+
+# grid.add_cell(1, 1, 1, 1, "CONST", initial_temp=100)
 
 try:
     while True:
